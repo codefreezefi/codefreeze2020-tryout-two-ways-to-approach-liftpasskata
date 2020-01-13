@@ -64,7 +64,8 @@ public class Prices {
 
     private static String calculateCostForNightTicket(Integer age, int baseCost) {
         if (age > 64) {
-            return "{ \"cost\": " + (int) Math.ceil(baseCost * .4) + "}";
+            int cost = (int) Math.ceil(baseCost * .4);
+            return "{ \"cost\": " + cost + "}";
         }
 
         return "{ \"cost\": " + baseCost + "}";
@@ -74,8 +75,8 @@ public class Prices {
         int reduction = calculateReduction(date, isHoliday);
 
         if (age == null) {
-            double cost = baseCost * (1 - reduction / 100.0);
-            return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
+            int cost = (int) Math.ceil(baseCost * (1 - reduction / 100.0));
+            return "{ \"cost\": " + cost + "}";
         }
 
         // TODO apply reduction for others
@@ -88,8 +89,8 @@ public class Prices {
             return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
         }
 
-        double cost = baseCost * (1 - reduction / 100.0);
-        return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
+        int cost = (int) Math.ceil(baseCost * (1 - reduction / 100.0));
+        return "{ \"cost\": " + cost + "}";
     }
 
     private static int calculateReduction(Date date, boolean isHoliday) {
