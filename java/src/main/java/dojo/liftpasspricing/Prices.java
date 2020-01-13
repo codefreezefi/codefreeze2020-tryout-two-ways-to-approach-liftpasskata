@@ -48,14 +48,13 @@ public class Prices {
             try (ResultSet result = costStmt.executeQuery()) {
                 result.next();
 
-                return calculateCost(connection, age, type, result.getInt("cost"), getDate(date));
+                return calculateCost(age, type, result.getInt("cost"), getDate(date), isHoliday(connection, getDate(date)));
             }
         }
     }
 
-    private static String calculateCost(Connection connection, Integer age, String type, int baseCost, Date date) throws SQLException, ParseException {
+    private static String calculateCost(Integer age, String type, int baseCost, Date date, boolean isHoliday) {
         int reduction;
-        boolean isHoliday = false;
 
         if (age != null && age < 6) {
             return "{ \"cost\": 0}";
@@ -63,8 +62,6 @@ public class Prices {
             reduction = 0;
 
             if (!type.equals("night")) {
-
-                isHoliday = isHoliday(connection, date);
 
                 if (date != null) {
                     Calendar calendar = Calendar.getInstance();
