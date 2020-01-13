@@ -28,4 +28,17 @@ public class Repository {
         }
         return isHoliday;
     }
+
+    static String putPrices(Connection connection, int liftPassCost, String liftPassType) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement( //
+                "INSERT INTO base_price (type, cost) VALUES (?, ?) " + //
+                        "ON DUPLICATE KEY UPDATE cost = ?")) {
+            stmt.setString(1, liftPassType);
+            stmt.setInt(2, liftPassCost);
+            stmt.setInt(3, liftPassCost);
+            stmt.execute();
+        }
+
+        return "";
+    }
 }

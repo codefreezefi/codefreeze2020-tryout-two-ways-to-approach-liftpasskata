@@ -25,7 +25,7 @@ public class Prices {
         port(4567);
 
         put("/prices", (req, res) -> {
-            return putPrices(connection, Integer.parseInt(req.queryParams("cost")), req.queryParams("type"));
+            return Repository.putPrices(connection, Integer.parseInt(req.queryParams("cost")), req.queryParams("type"));
         });
 
         get("/prices", (req, res) -> {
@@ -119,19 +119,6 @@ public class Prices {
             d = isoFormat.parse(date);
         }
         return d;
-    }
-
-    private static String putPrices(Connection connection, int liftPassCost, String liftPassType) throws SQLException {
-        try (PreparedStatement stmt = connection.prepareStatement( //
-                "INSERT INTO base_price (type, cost) VALUES (?, ?) " + //
-                        "ON DUPLICATE KEY UPDATE cost = ?")) {
-            stmt.setString(1, liftPassType);
-            stmt.setInt(2, liftPassCost);
-            stmt.setInt(3, liftPassCost);
-            stmt.execute();
-        }
-
-        return "";
     }
 
 }
