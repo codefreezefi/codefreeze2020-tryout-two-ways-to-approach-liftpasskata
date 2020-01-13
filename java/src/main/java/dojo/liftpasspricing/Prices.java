@@ -82,15 +82,16 @@ public class Prices {
             }
         }
 
-        // TODO apply reduction for others
-        if (age != null && age < 15) {
-            return "{ \"cost\": " + (int) Math.ceil(baseCost * .7) + "}";
-        }
-
         if (age == null) {
             double cost = baseCost * (1 - reduction / 100.0);
             return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
         }
+
+        // TODO apply reduction for others
+        if (age < 15) {
+            return "{ \"cost\": " + (int) Math.ceil(baseCost * .7) + "}";
+        }
+
         if (age > 64) {
             double cost = baseCost * .75 * (1 - reduction / 100.0);
             return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
