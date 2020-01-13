@@ -45,17 +45,14 @@ public class Prices {
     }
 
     private static String calculateCost(Integer age, String type, int baseCost, Date date, boolean isHoliday) {
-        int reduction;
 
         if (age != null && age < 6) {
             return "{ \"cost\": 0}";
         }
 
-        reduction = 0;
-
         if (isDay(type)) {
 
-            return calculateCostForDayTicket(age, baseCost, date, isHoliday, reduction);
+            return calculateCostForDayTicket(age, baseCost, date, isHoliday);
         }
 
         if (age != null) {
@@ -73,14 +70,8 @@ public class Prices {
         return "{ \"cost\": " + baseCost + "}";
     }
 
-    private static String calculateCostForDayTicket(Integer age, int baseCost, Date date, boolean isHoliday, int reduction) {
-        if (date != null) {
-            if (!isHoliday) {
-                if (isMonday(date)) {
-                    reduction = 35;
-                }
-            }
-        }
+    private static String calculateCostForDayTicket(Integer age, int baseCost, Date date, boolean isHoliday) {
+        int reduction = calculateReduction(date, isHoliday);
 
         if (age == null) {
             double cost = baseCost * (1 - reduction / 100.0);
@@ -99,6 +90,18 @@ public class Prices {
 
         double cost = baseCost * (1 - reduction / 100.0);
         return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
+    }
+
+    private static int calculateReduction(Date date, boolean isHoliday) {
+        int reduction = 0;
+        if (date != null) {
+            if (!isHoliday) {
+                if (isMonday(date)) {
+                    reduction = 35;
+                }
+            }
+        }
+        return reduction;
     }
 
     private static boolean isMonday(Date date) {
