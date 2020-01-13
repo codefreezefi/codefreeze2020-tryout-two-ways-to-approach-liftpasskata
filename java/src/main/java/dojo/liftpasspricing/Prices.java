@@ -48,12 +48,12 @@ public class Prices {
             try (ResultSet result = costStmt.executeQuery()) {
                 result.next();
 
-                return calculateCost(connection, age, type, date, result.getInt("cost"));
+                return calculateCost(connection, age, type, result.getInt("cost"), getDate(date));
             }
         }
     }
 
-    private static String calculateCost(Connection connection, Integer age, String type, String date, int baseCost) throws SQLException, ParseException {
+    private static String calculateCost(Connection connection, Integer age, String type, int baseCost, Date date) throws SQLException, ParseException {
         int reduction;
         boolean isHoliday = false;
 
@@ -63,11 +63,6 @@ public class Prices {
             reduction = 0;
 
             if (!type.equals("night")) {
-                DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date d = null;
-                if (date != null) {
-                    d = isoFormat.parse(date);
-                }
 
                 try (PreparedStatement holidayStmt = connection.prepareStatement( //
                         "SELECT * FROM holidays")) {
@@ -75,10 +70,10 @@ public class Prices {
 
                         while (holidays.next()) {
                             Date holiday = holidays.getDate("holiday");
-                            if (d != null) {
-                                if (d.getYear() == holiday.getYear() && //
-                                        d.getMonth() == holiday.getMonth() && //
-                                        d.getDate() == holiday.getDate()) {
+                            if (date != null) {
+                                if (date.getYear() == holiday.getYear() && //
+                                        date.getMonth() == holiday.getMonth() && //
+                                        date.getDate() == holiday.getDate()) {
                                     isHoliday = true;
                                 }
                             }
@@ -87,9 +82,9 @@ public class Prices {
                     }
                 }
 
-                if (d != null) {
+                if (date != null) {
                     Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(d);
+                    calendar.setTime(date);
                     if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == 2) {
                         reduction = 35;
                     }
@@ -124,6 +119,15 @@ public class Prices {
                 }
             }
         }
+    }
+
+    private static Date getDate(String date) throws ParseException {
+        DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date d = null;
+        if (date != null) {
+            d = isoFormat.parse(date);
+        }
+        return d;
     }
 
     private static String putPrices(Connection connection, int liftPassCost, String liftPassType) throws SQLException {
