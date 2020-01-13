@@ -27,9 +27,8 @@ public class Repository {
         return "";
     }
 
-    boolean isHoliday(Connection connection, Date date) throws SQLException {
+    boolean isHoliday(Date date) throws SQLException {
         boolean isHoliday = false;
-        this.connection = connection;
         try (PreparedStatement holidayStmt = this.connection.prepareStatement( //
                 "SELECT * FROM holidays")) {
             try (ResultSet holidays = holidayStmt.executeQuery()) {

@@ -48,7 +48,7 @@ public class Prices {
             try (ResultSet result = costStmt.executeQuery()) {
                 result.next();
 
-                return calculateCost(age, type, result.getInt("cost"), getDate(date), new Repository(connection).isHoliday(connection, getDate(date)));
+                return calculateCost(age, type, result.getInt("cost"), getDate(date), new Repository(connection).isHoliday(getDate(date)));
             }
         }
     }
