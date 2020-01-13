@@ -48,7 +48,7 @@ public class Prices {
     private static int calculateCost(Integer age, String type, int baseCost, Date date, boolean isHoliday) {
         int cost = 0;
 
-         if (isDay(type)) {
+        if (isDay(type)) {
             cost = calculateCostForDayTicket(age, baseCost, date, isHoliday);
         } else {
             cost = calculateCostForNightTicket(age, baseCost);
@@ -95,17 +95,14 @@ public class Prices {
 
     private static int calculateReduction(Date date, boolean isHoliday) {
         int reduction = 0;
-        if (date != null) {
-            if (!isHoliday) {
-                if (isMonday(date)) {
-                    reduction = 35;
-                }
-            }
+        if (date != null && !isHoliday && isMonday(date)) {
+            reduction = 35;
         }
         return reduction;
     }
 
     private static boolean isMonday(Date date) {
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         return calendar.get(Calendar.DAY_OF_WEEK) == 2;
