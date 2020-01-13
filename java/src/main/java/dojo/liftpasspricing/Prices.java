@@ -21,15 +21,16 @@ public class Prices {
     public static Connection createApp() throws SQLException {
 
         final Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/lift_pass", "root", "mysql");
+        Repository repository = new Repository(connection);
 
         port(4567);
 
         put("/prices", (req, res) -> {
-            return new Repository(connection).putPrices(Integer.parseInt(req.queryParams("cost")), req.queryParams("type"));
+            return repository.putPrices(Integer.parseInt(req.queryParams("cost")), req.queryParams("type"));
         });
 
         get("/prices", (req, res) -> {
-            return getPrices(connection, req.queryParams("age") != null ? Integer.valueOf(req.queryParams("age")) : null, req.queryParams("type"), req.queryParams("date"));
+            return getPrices(connection, req.queryParams("age") != null ? Integer.valueOf(req.queryParams("age")) : null, req.queryParams("type"), req.queryParams("date"), repository);
         });
 
         after((req, res) -> {
@@ -39,7 +40,7 @@ public class Prices {
         return connection;
     }
 
-    private static String getPrices(Connection connection, Integer age, String type, String date) throws SQLException, ParseException {
+    private static String getPrices(Connection connection, Integer age, String type, String date, Repository repository) throws SQLException, ParseException {
 
         try (PreparedStatement costStmt = connection.prepareStatement( //
                 "SELECT cost FROM base_price " + //
@@ -48,7 +49,7 @@ public class Prices {
             try (ResultSet result = costStmt.executeQuery()) {
                 result.next();
 
-                return calculateCost(age, type, result.getInt("cost"), getDate(date), new Repository(connection).isHoliday(getDate(date)));
+                return calculateCost(age, type, result.getInt("cost"), getDate(date), repository.isHoliday(getDate(date)));
             }
         }
     }
