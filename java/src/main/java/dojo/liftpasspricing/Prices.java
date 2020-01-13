@@ -72,19 +72,16 @@ public class Prices {
     }
 
     private static String calculateCostForDayTicket(Integer age, int baseCost, Date date, boolean isHoliday) {
-        int reduction = calculateReduction(date, isHoliday);
 
-        if (age == null) {
-            int cost = (int) Math.ceil(baseCost * (1 - reduction / 100.0));
+        // TODO apply reduction for others
+        if (age != null && age < 15) {
+            int cost = (int) Math.ceil(baseCost * .7);
             return "{ \"cost\": " + cost + "}";
         }
 
-        // TODO apply reduction for others
-        if (age < 15) {
-            return "{ \"cost\": " + (int) Math.ceil(baseCost * .7) + "}";
-        }
+        int reduction = calculateReduction(date, isHoliday);
 
-        if (age > 64) {
+        if (age != null && age > 64) {
             double cost = baseCost * .75 * (1 - reduction / 100.0);
             return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
         }
