@@ -42,6 +42,7 @@ public class Prices {
 
     private static String getPrices(Connection connection, Integer age, String type, String date, Repository repository) throws SQLException, ParseException {
 
+        int cost = 0;
         try (PreparedStatement costStmt = connection.prepareStatement( //
                 "SELECT cost FROM base_price " + //
                         "WHERE type = ?")) {
@@ -49,9 +50,10 @@ public class Prices {
             try (ResultSet result = costStmt.executeQuery()) {
                 result.next();
 
-                return calculateCost(age, type, result.getInt("cost"), getDate(date), repository.isHoliday(getDate(date)));
+                cost = result.getInt("cost");
             }
         }
+        return calculateCost(age, type, cost, getDate(date), repository.isHoliday(getDate(date)));
     }
 
     private static String calculateCost(Integer age, String type, int baseCost, Date date, boolean isHoliday) {
