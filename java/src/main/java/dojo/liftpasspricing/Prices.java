@@ -47,18 +47,23 @@ public class Prices {
     private static String calculateCost(Integer age, String type, int baseCost, Date date, boolean isHoliday) {
         int cost = 0;
 
-        if (age != null && age < 6) {
-            cost = 0;
-        } else if (isDay(type)) {
+
+
+         if (isDay(type)) {
             cost = calculateCostForDayTicket(age, baseCost, date, isHoliday);
         } else {
             cost = calculateCostForNightTicket(age, baseCost);
         }
+
         return "{ \"cost\": " + cost + "}";
     }
 
     private static int calculateCostForNightTicket(Integer age, int baseCost) {
         if (age == null) {
+            return 0;
+        }
+
+        if (age < 6) {
             return 0;
         }
 
@@ -70,6 +75,10 @@ public class Prices {
     }
 
     private static int calculateCostForDayTicket(Integer age, int baseCost, Date date, boolean isHoliday) {
+
+        if (age != null && age < 6) {
+            return 0;
+        }
 
         // TODO apply reduction for others
         if (age != null && age < 15) {
