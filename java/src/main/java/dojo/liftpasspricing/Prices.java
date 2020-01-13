@@ -1,7 +1,5 @@
 package dojo.liftpasspricing;
 
-import spark.Request;
-
 import static spark.Spark.after;
 import static spark.Spark.get;
 import static spark.Spark.port;
@@ -31,7 +29,7 @@ public class Prices {
         });
 
         get("/prices", (req, res) -> {
-            return getPrices(connection, req);
+            return getPrices(connection, req.queryParams("age") != null ? Integer.valueOf(req.queryParams("age")) : null, req.queryParams("type"), req.queryParams("date"));
         });
 
         after((req, res) -> {
@@ -41,13 +39,12 @@ public class Prices {
         return connection;
     }
 
-    private static Object getPrices(Connection connection, Request req) throws SQLException, ParseException {
-        final Integer age = req.queryParams("age") != null ? Integer.valueOf(req.queryParams("age")) : null;
+    private static Object getPrices(Connection connection, Integer age, String type, String date) throws SQLException, ParseException {
 
         try (PreparedStatement costStmt = connection.prepareStatement( //
                 "SELECT cost FROM base_price " + //
                 "WHERE type = ?")) {
-            costStmt.setString(1, req.queryParams("type"));
+            costStmt.setString(1, type);
             try (ResultSet result = costStmt.executeQuery()) {
                 result.next();
 
@@ -59,7 +56,7 @@ public class Prices {
                 } else {
                     reduction = 0;
 
-                    if (!req.queryParams("type").equals("night")) {
+                    if (!type.equals("night")) {
                         DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
                         try (PreparedStatement holidayStmt = connection.prepareStatement( //
@@ -68,8 +65,8 @@ public class Prices {
 
                                 while (holidays.next()) {
                                     Date holiday = holidays.getDate("holiday");
-                                    if (req.queryParams("date") != null) {
-                                        Date d = isoFormat.parse(req.queryParams("date"));
+                                    if (date != null) {
+                                        Date d = isoFormat.parse(date);
                                         if (d.getYear() == holiday.getYear() && //
                                             d.getMonth() == holiday.getMonth() && //
                                             d.getDate() == holiday.getDate()) {
@@ -81,9 +78,9 @@ public class Prices {
                             }
                         }
 
-                        if (req.queryParams("date") != null) {
+                        if (date != null) {
                             Calendar calendar = Calendar.getInstance();
-                            calendar.setTime(isoFormat.parse(req.queryParams("date")));
+                            calendar.setTime(isoFormat.parse(date));
                             if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == 2) {
                                 reduction = 35;
                             }
