@@ -43,7 +43,7 @@ public class Repository {
         return "";
     }
 
-    boolean isHoliday(Date date, LocalDate localDate) throws SQLException {
+    boolean isHoliday(LocalDate localDate) throws SQLException {
         boolean isHoliday = false;
         try (PreparedStatement holidayStmt = this.connection.prepareStatement( //
                 "SELECT * FROM holidays")) {

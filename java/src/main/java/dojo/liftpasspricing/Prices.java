@@ -40,11 +40,10 @@ public class Prices {
         return connection;
     }
 
-    private static int getPrices(Integer age, String type, String dateString, Repository repository) throws SQLException, ParseException {
+    private static int getPrices(Integer age, String type, String dateString, Repository repository) throws SQLException {
         int baseCost = repository.getBaseCost(type);
-        Date date = getDate(dateString);
         LocalDate localDate = getLocalDate(dateString);
-        return calculateCost(age, type, baseCost, repository.isHoliday(date, localDate), localDate);
+        return calculateCost(age, type, baseCost, repository.isHoliday(localDate), localDate);
     }
 
     private static int calculateCost(Integer age, String type, int baseCost, boolean isHoliday, LocalDate localDate) {
@@ -105,15 +104,6 @@ public class Prices {
 
     private static boolean isDay(String type) {
         return !type.equals("night");
-    }
-
-    private static Date getDate(String date) throws ParseException {
-        DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date d = null;
-        if (date != null) {
-            d = isoFormat.parse(date);
-        }
-        return d;
     }
 
     private static LocalDate getLocalDate(String date) {
