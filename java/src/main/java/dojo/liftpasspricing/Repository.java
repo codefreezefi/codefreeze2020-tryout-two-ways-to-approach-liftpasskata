@@ -14,7 +14,10 @@ public class Repository {
         this.connection = connection;
     }
 
-    static String putPrices(Connection connection, int liftPassCost, String liftPassType) throws SQLException {
+    public Repository() {
+    }
+
+    String putPrices(int liftPassCost, String liftPassType) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement( //
                 "INSERT INTO base_price (type, cost) VALUES (?, ?) " + //
                         "ON DUPLICATE KEY UPDATE cost = ?")) {

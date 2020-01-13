@@ -25,7 +25,7 @@ public class Prices {
         port(4567);
 
         put("/prices", (req, res) -> {
-            return Repository.putPrices(connection, Integer.parseInt(req.queryParams("cost")), req.queryParams("type"));
+            return new Repository(connection).putPrices(Integer.parseInt(req.queryParams("cost")), req.queryParams("type"));
         });
 
         get("/prices", (req, res) -> {
