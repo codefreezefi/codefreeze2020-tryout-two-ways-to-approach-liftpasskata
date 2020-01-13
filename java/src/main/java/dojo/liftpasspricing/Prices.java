@@ -44,7 +44,7 @@ public class Prices {
         int baseCost = repository.getBaseCost(type);
         Date date = getDate(dateString);
         LocalDate localDate = getLocalDate(dateString);
-        return calculateCost(age, type, baseCost, repository.isHoliday(date), localDate);
+        return calculateCost(age, type, baseCost, repository.isHoliday(date, localDate), localDate);
     }
 
     private static int calculateCost(Integer age, String type, int baseCost, boolean isHoliday, LocalDate localDate) {

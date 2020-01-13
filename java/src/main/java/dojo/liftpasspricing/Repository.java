@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Date;
 
 public class Repository {
@@ -42,18 +43,17 @@ public class Repository {
         return "";
     }
 
-    boolean isHoliday(Date date) throws SQLException {
+    boolean isHoliday(Date date, LocalDate localDate) throws SQLException {
         boolean isHoliday = false;
         try (PreparedStatement holidayStmt = this.connection.prepareStatement( //
                 "SELECT * FROM holidays")) {
             try (ResultSet holidays = holidayStmt.executeQuery()) {
 
                 while (holidays.next()) {
-                    Date holiday = holidays.getDate("holiday");
-                    if (date != null) {
-                        if (date.getYear() == holiday.getYear() && //
-                                date.getMonth() == holiday.getMonth() && //
-                                date.getDate() == holiday.getDate()) {
+                    java.sql.Date holiday = holidays.getDate("holiday");
+                    if (localDate != null) {
+
+                        if (localDate.equals(holiday.toLocalDate())) {
                             isHoliday = true;
                         }
                     }
