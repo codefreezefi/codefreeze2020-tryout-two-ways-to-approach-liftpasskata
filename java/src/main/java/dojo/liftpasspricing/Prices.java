@@ -7,8 +7,6 @@ import static spark.Spark.put;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -42,17 +40,7 @@ public class Prices {
 
     private static String getPrices(Connection connection, Integer age, String type, String date, Repository repository) throws SQLException, ParseException {
 
-        int cost = 0;
-        try (PreparedStatement costStmt = connection.prepareStatement( //
-                "SELECT cost FROM base_price " + //
-                        "WHERE type = ?")) {
-            costStmt.setString(1, type);
-            try (ResultSet result = costStmt.executeQuery()) {
-                result.next();
-
-                cost = result.getInt("cost");
-            }
-        }
+        int cost = new Repository(connection).getBaseCost(type);
         return calculateCost(age, type, cost, getDate(date), repository.isHoliday(getDate(date)));
     }
 

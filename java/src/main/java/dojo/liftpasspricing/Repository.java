@@ -14,7 +14,19 @@ public class Repository {
         this.connection = connection;
     }
 
-    public Repository() {
+    int getBaseCost(String type) throws SQLException {
+        int cost = 0;
+        try (PreparedStatement costStmt = connection.prepareStatement( //
+                "SELECT cost FROM base_price " + //
+                        "WHERE type = ?")) {
+            costStmt.setString(1, type);
+            try (ResultSet result = costStmt.executeQuery()) {
+                result.next();
+
+                cost = result.getInt("cost");
+            }
+        }
+        return cost;
     }
 
     String putPrices(int liftPassCost, String liftPassType) throws SQLException {
