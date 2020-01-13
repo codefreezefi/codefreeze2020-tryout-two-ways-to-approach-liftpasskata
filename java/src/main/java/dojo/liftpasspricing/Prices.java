@@ -51,13 +51,17 @@ public class Prices {
             cost = 0;
         } else if (isDay(type)) {
             cost = calculateCostForDayTicket(age, baseCost, date, isHoliday);
-        }else if (age != null) {
+        } else {
             cost = calculateCostForNightTicket(age, baseCost);
         }
         return "{ \"cost\": " + cost + "}";
     }
 
     private static int calculateCostForNightTicket(Integer age, int baseCost) {
+        if (age == null) {
+            return 0;
+        }
+
         if (age > 64) {
             return (int) Math.ceil(baseCost * .4);
         }
@@ -70,14 +74,12 @@ public class Prices {
         // TODO apply reduction for others
         if (age != null && age < 15) {
             return (int) Math.ceil(baseCost * .7);
-
         }
 
         int reduction = calculateReduction(date, isHoliday);
 
         if (age != null && age > 64) {
             return (int) Math.ceil(baseCost * .75 * (1 - reduction / 100.0));
-
         }
 
         return (int) Math.ceil(baseCost * (1 - reduction / 100.0));
