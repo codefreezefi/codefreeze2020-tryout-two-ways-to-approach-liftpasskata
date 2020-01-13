@@ -13,7 +13,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.Date;
 
 public class Prices {
@@ -45,14 +44,14 @@ public class Prices {
         int baseCost = repository.getBaseCost(type);
         Date date = getDate(dateString);
         LocalDate localDate = getLocalDate(dateString);
-        return calculateCost(age, type, baseCost, date, repository.isHoliday(date), localDate);
+        return calculateCost(age, type, baseCost, repository.isHoliday(date), localDate);
     }
 
-    private static int calculateCost(Integer age, String type, int baseCost, Date date, boolean isHoliday, LocalDate localDate) {
+    private static int calculateCost(Integer age, String type, int baseCost, boolean isHoliday, LocalDate localDate) {
         int cost = 0;
 
         if (isDay(type)) {
-            cost = calculateCostForDayTicket(age, baseCost, date, isHoliday, localDate);
+            cost = calculateCostForDayTicket(age, baseCost, isHoliday, localDate);
         } else {
             cost = calculateCostForNightTicket(age, baseCost);
         }
@@ -76,7 +75,7 @@ public class Prices {
         return baseCost;
     }
 
-    private static int calculateCostForDayTicket(Integer age, int baseCost, Date date, boolean isHoliday, LocalDate localDate) {
+    private static int calculateCostForDayTicket(Integer age, int baseCost, boolean isHoliday, LocalDate localDate) {
 
         if (age != null && age < 6) {
             return 0;
@@ -87,7 +86,7 @@ public class Prices {
             return (int) Math.ceil(baseCost * .7);
         }
 
-        int reduction = calculateReduction(date, isHoliday, localDate);
+        int reduction = calculateReduction(isHoliday, localDate);
 
         if (age != null && age > 64) {
             return (int) Math.ceil(baseCost * .75 * (1 - reduction / 100.0));
@@ -96,7 +95,7 @@ public class Prices {
         return (int) Math.ceil(baseCost * (1 - reduction / 100.0));
     }
 
-    private static int calculateReduction(Date date, boolean isHoliday, LocalDate localDate) {
+    private static int calculateReduction(boolean isHoliday, LocalDate localDate) {
         int reduction = 0;
         if (localDate != null && !isHoliday && localDate.getDayOfWeek() == DayOfWeek.MONDAY) {
             reduction = 35;
