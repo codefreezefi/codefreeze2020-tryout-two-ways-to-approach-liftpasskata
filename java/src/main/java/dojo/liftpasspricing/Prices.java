@@ -49,46 +49,46 @@ public class Prices {
 
         if (age != null && age < 6) {
             return "{ \"cost\": 0}";
-        } else {
-            reduction = 0;
+        }
 
-            if (isDay(type)) {
+        reduction = 0;
 
-                if (date != null) {
-                    if (!isHoliday) {
-                        if (isMonday(date)) {
-                            reduction = 35;
-                        }
+        if (isDay(type)) {
+
+            if (date != null) {
+                if (!isHoliday) {
+                    if (isMonday(date)) {
+                        reduction = 35;
                     }
                 }
+            }
 
-                // TODO apply reduction for others
-                if (age != null && age < 15) {
-                    return "{ \"cost\": " + (int) Math.ceil(baseCost * .7) + "}";
+            // TODO apply reduction for others
+            if (age != null && age < 15) {
+                return "{ \"cost\": " + (int) Math.ceil(baseCost * .7) + "}";
+            } else {
+                if (age == null) {
+                    double cost = baseCost * (1 - reduction / 100.0);
+                    return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
                 } else {
-                    if (age == null) {
-                        double cost = baseCost * (1 - reduction / 100.0);
+                    if (age > 64) {
+                        double cost = baseCost * .75 * (1 - reduction / 100.0);
                         return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
                     } else {
-                        if (age > 64) {
-                            double cost = baseCost * .75 * (1 - reduction / 100.0);
-                            return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
-                        } else {
-                            double cost = baseCost * (1 - reduction / 100.0);
-                            return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
-                        }
+                        double cost = baseCost * (1 - reduction / 100.0);
+                        return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
                     }
+                }
+            }
+        } else {
+            if (age != null && age >= 6) {
+                if (age > 64) {
+                    return "{ \"cost\": " + (int) Math.ceil(baseCost * .4) + "}";
+                } else {
+                    return "{ \"cost\": " + baseCost + "}";
                 }
             } else {
-                if (age != null && age >= 6) {
-                    if (age > 64) {
-                        return "{ \"cost\": " + (int) Math.ceil(baseCost * .4) + "}";
-                    } else {
-                        return "{ \"cost\": " + baseCost + "}";
-                    }
-                } else {
-                    return "{ \"cost\": 0}";
-                }
+                return "{ \"cost\": 0}";
             }
         }
     }
