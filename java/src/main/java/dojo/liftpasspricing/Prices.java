@@ -39,10 +39,10 @@ public class Prices {
         return connection;
     }
 
-    private static int getPrices(Integer age, String type, String date, Repository repository) throws SQLException, ParseException {
-
+    private static int getPrices(Integer age, String type, String dateString, Repository repository) throws SQLException, ParseException {
         int baseCost = repository.getBaseCost(type);
-        return calculateCost(age, type, baseCost, getDate(date), repository.isHoliday(getDate(date)));
+        Date date = getDate(dateString);
+        return calculateCost(age, type, baseCost, date, repository.isHoliday(date));
     }
 
     private static int calculateCost(Integer age, String type, int baseCost, Date date, boolean isHoliday) {
@@ -102,7 +102,6 @@ public class Prices {
     }
 
     private static boolean isMonday(Date date) {
-
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         return calendar.get(Calendar.DAY_OF_WEEK) == 2;
