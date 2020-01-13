@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
@@ -97,16 +98,10 @@ public class Prices {
 
     private static int calculateReduction(Date date, boolean isHoliday, LocalDate localDate) {
         int reduction = 0;
-        if (localDate != null && !isHoliday && isMonday(date)) {
+        if (localDate != null && !isHoliday && localDate.getDayOfWeek() == DayOfWeek.MONDAY) {
             reduction = 35;
         }
         return reduction;
-    }
-
-    private static boolean isMonday(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        return calendar.get(Calendar.DAY_OF_WEEK) == 2;
     }
 
     private static boolean isDay(String type) {
