@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -42,6 +43,7 @@ public class Prices {
     private static int getPrices(Integer age, String type, String dateString, Repository repository) throws SQLException, ParseException {
         int baseCost = repository.getBaseCost(type);
         Date date = getDate(dateString);
+        LocalDate localDate = getLocalDate(dateString);
         return calculateCost(age, type, baseCost, date, repository.isHoliday(date));
     }
 
@@ -116,6 +118,14 @@ public class Prices {
         Date d = null;
         if (date != null) {
             d = isoFormat.parse(date);
+        }
+        return d;
+    }
+
+    private static LocalDate getLocalDate(String date) {
+        LocalDate d = null;
+        if (date != null) {
+            d = LocalDate.parse(date);
         }
         return d;
     }
