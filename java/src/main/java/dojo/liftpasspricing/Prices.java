@@ -45,37 +45,31 @@ public class Prices {
     }
 
     private static String calculateCost(Integer age, String type, int baseCost, Date date, boolean isHoliday) {
+        int cost = 0;
 
         if (age != null && age < 6) {
-            return "{ \"cost\": 0}";
+            cost = 0;
+        } else if (isDay(type)) {
+            cost = calculateCostForDayTicket(age, baseCost, date, isHoliday);
+        }else if (age != null) {
+            cost = calculateCostForNightTicket(age, baseCost);
         }
-
-        if (isDay(type)) {
-            int cost = calculateCostForDayTicket(age, baseCost, date, isHoliday);
-            return "{ \"cost\": " + cost + "}";
-        }
-
-        if (age != null) {
-            return calculateCostForNightTicket(age, baseCost);
-        }
-
-        return "{ \"cost\": 0}";
+        return "{ \"cost\": " + cost + "}";
     }
 
-    private static String calculateCostForNightTicket(Integer age, int baseCost) {
+    private static int calculateCostForNightTicket(Integer age, int baseCost) {
         if (age > 64) {
-            int cost = (int) Math.ceil(baseCost * .4);
-            return "{ \"cost\": " + cost + "}";
+            return (int) Math.ceil(baseCost * .4);
         }
 
-        return "{ \"cost\": " + baseCost + "}";
+        return baseCost;
     }
 
     private static int calculateCostForDayTicket(Integer age, int baseCost, Date date, boolean isHoliday) {
 
         // TODO apply reduction for others
         if (age != null && age < 15) {
-           return (int) Math.ceil(baseCost * .7);
+            return (int) Math.ceil(baseCost * .7);
 
         }
 
@@ -86,7 +80,7 @@ public class Prices {
 
         }
 
-       return (int) Math.ceil(baseCost * (1 - reduction / 100.0));
+        return (int) Math.ceil(baseCost * (1 - reduction / 100.0));
     }
 
     private static int calculateReduction(Date date, boolean isHoliday) {
