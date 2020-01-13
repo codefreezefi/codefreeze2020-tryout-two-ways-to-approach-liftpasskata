@@ -48,7 +48,7 @@ public class Prices {
             try (ResultSet result = costStmt.executeQuery()) {
                 result.next();
 
-                return calculateCost(age, type, result.getInt("cost"), getDate(date), isHoliday(connection, getDate(date)));
+                return calculateCost(age, type, result.getInt("cost"), getDate(date), Repository.isHoliday(connection, getDate(date)));
             }
         }
     }
@@ -110,28 +110,6 @@ public class Prices {
 
     private static boolean isDay(String type) {
         return !type.equals("night");
-    }
-
-    private static boolean isHoliday(Connection connection, Date date) throws SQLException {
-        boolean isHoliday = false;
-        try (PreparedStatement holidayStmt = connection.prepareStatement( //
-                "SELECT * FROM holidays")) {
-            try (ResultSet holidays = holidayStmt.executeQuery()) {
-
-                while (holidays.next()) {
-                    Date holiday = holidays.getDate("holiday");
-                    if (date != null) {
-                        if (date.getYear() == holiday.getYear() && //
-                                date.getMonth() == holiday.getMonth() && //
-                                date.getDate() == holiday.getDate()) {
-                            isHoliday = true;
-                        }
-                    }
-                }
-
-            }
-        }
-        return isHoliday;
     }
 
     private static Date getDate(String date) throws ParseException {
