@@ -39,7 +39,7 @@ public class Prices {
         return connection;
     }
 
-    private static Object getPrices(Connection connection, Integer age, String type, String date) throws SQLException, ParseException {
+    private static String getPrices(Connection connection, Integer age, String type, String date) throws SQLException, ParseException {
 
         try (PreparedStatement costStmt = connection.prepareStatement( //
                 "SELECT cost FROM base_price " + //
