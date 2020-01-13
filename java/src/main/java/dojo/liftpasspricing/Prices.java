@@ -44,14 +44,14 @@ public class Prices {
         int baseCost = repository.getBaseCost(type);
         Date date = getDate(dateString);
         LocalDate localDate = getLocalDate(dateString);
-        return calculateCost(age, type, baseCost, date, repository.isHoliday(date));
+        return calculateCost(age, type, baseCost, date, repository.isHoliday(date), localDate);
     }
 
-    private static int calculateCost(Integer age, String type, int baseCost, Date date, boolean isHoliday) {
+    private static int calculateCost(Integer age, String type, int baseCost, Date date, boolean isHoliday, LocalDate localDate) {
         int cost = 0;
 
         if (isDay(type)) {
-            cost = calculateCostForDayTicket(age, baseCost, date, isHoliday);
+            cost = calculateCostForDayTicket(age, baseCost, date, isHoliday, localDate);
         } else {
             cost = calculateCostForNightTicket(age, baseCost);
         }
@@ -75,7 +75,7 @@ public class Prices {
         return baseCost;
     }
 
-    private static int calculateCostForDayTicket(Integer age, int baseCost, Date date, boolean isHoliday) {
+    private static int calculateCostForDayTicket(Integer age, int baseCost, Date date, boolean isHoliday, LocalDate localDate) {
 
         if (age != null && age < 6) {
             return 0;
@@ -86,7 +86,7 @@ public class Prices {
             return (int) Math.ceil(baseCost * .7);
         }
 
-        int reduction = calculateReduction(date, isHoliday);
+        int reduction = calculateReduction(date, isHoliday, localDate);
 
         if (age != null && age > 64) {
             return (int) Math.ceil(baseCost * .75 * (1 - reduction / 100.0));
@@ -95,9 +95,9 @@ public class Prices {
         return (int) Math.ceil(baseCost * (1 - reduction / 100.0));
     }
 
-    private static int calculateReduction(Date date, boolean isHoliday) {
+    private static int calculateReduction(Date date, boolean isHoliday, LocalDate localDate) {
         int reduction = 0;
-        if (date != null && !isHoliday && isMonday(date)) {
+        if (localDate != null && !isHoliday && isMonday(date)) {
             reduction = 35;
         }
         return reduction;
