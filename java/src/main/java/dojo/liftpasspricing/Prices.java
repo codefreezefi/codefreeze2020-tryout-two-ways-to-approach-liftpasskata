@@ -43,7 +43,7 @@ public class Prices {
 
         try (PreparedStatement costStmt = connection.prepareStatement( //
                 "SELECT cost FROM base_price " + //
-                "WHERE type = ?")) {
+                        "WHERE type = ?")) {
             costStmt.setString(1, type);
             try (ResultSet result = costStmt.executeQuery()) {
                 result.next();
@@ -64,6 +64,10 @@ public class Prices {
 
             if (!type.equals("night")) {
                 DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date d = null;
+                if (date != null) {
+                    d = isoFormat.parse(date);
+                }
 
                 try (PreparedStatement holidayStmt = connection.prepareStatement( //
                         "SELECT * FROM holidays")) {
@@ -71,11 +75,10 @@ public class Prices {
 
                         while (holidays.next()) {
                             Date holiday = holidays.getDate("holiday");
-                            if (date != null) {
-                                Date d = isoFormat.parse(date);
+                            if (d != null) {
                                 if (d.getYear() == holiday.getYear() && //
-                                    d.getMonth() == holiday.getMonth() && //
-                                    d.getDate() == holiday.getDate()) {
+                                        d.getMonth() == holiday.getMonth() && //
+                                        d.getDate() == holiday.getDate()) {
                                     isHoliday = true;
                                 }
                             }
@@ -126,7 +129,7 @@ public class Prices {
     private static String putPrices(Connection connection, int liftPassCost, String liftPassType) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement( //
                 "INSERT INTO base_price (type, cost) VALUES (?, ?) " + //
-                "ON DUPLICATE KEY UPDATE cost = ?")) {
+                        "ON DUPLICATE KEY UPDATE cost = ?")) {
             stmt.setString(1, liftPassType);
             stmt.setInt(2, liftPassCost);
             stmt.setInt(3, liftPassCost);
