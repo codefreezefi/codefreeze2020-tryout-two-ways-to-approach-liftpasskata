@@ -28,7 +28,7 @@ public class Prices {
         });
 
         get("/prices", (req, res) -> {
-            return getPrices(connection, req.queryParams("age") != null ? Integer.valueOf(req.queryParams("age")) : null, req.queryParams("type"), req.queryParams("date"), repository);
+            return getPrices(req.queryParams("age") != null ? Integer.valueOf(req.queryParams("age")) : null, req.queryParams("type"), req.queryParams("date"), repository);
         });
 
         after((req, res) -> {
@@ -38,9 +38,9 @@ public class Prices {
         return connection;
     }
 
-    private static String getPrices(Connection connection, Integer age, String type, String date, Repository repository) throws SQLException, ParseException {
+    private static String getPrices(Integer age, String type, String date, Repository repository) throws SQLException, ParseException {
 
-        int cost = new Repository(connection).getBaseCost(type);
+        int cost = repository.getBaseCost(type);
         return calculateCost(age, type, cost, getDate(date), repository.isHoliday(getDate(date)));
     }
 
