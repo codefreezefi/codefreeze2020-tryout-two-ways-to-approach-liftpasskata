@@ -40,14 +40,13 @@ public class Prices {
 
     private static String getPrices(Integer age, String type, String date, Repository repository) throws SQLException, ParseException {
 
-        int cost = repository.getBaseCost(type);
-        return calculateCost(age, type, cost, getDate(date), repository.isHoliday(getDate(date)));
+        int baseCost = repository.getBaseCost(type);
+        int cost = calculateCost(age, type, baseCost, getDate(date), repository.isHoliday(getDate(date)));
+        return  "{ \"cost\": " + cost + "}";
     }
 
-    private static String calculateCost(Integer age, String type, int baseCost, Date date, boolean isHoliday) {
+    private static int calculateCost(Integer age, String type, int baseCost, Date date, boolean isHoliday) {
         int cost = 0;
-
-
 
          if (isDay(type)) {
             cost = calculateCostForDayTicket(age, baseCost, date, isHoliday);
@@ -55,7 +54,7 @@ public class Prices {
             cost = calculateCostForNightTicket(age, baseCost);
         }
 
-        return "{ \"cost\": " + cost + "}";
+        return cost;
     }
 
     private static int calculateCostForNightTicket(Integer age, int baseCost) {
