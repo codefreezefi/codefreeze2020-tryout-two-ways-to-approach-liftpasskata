@@ -7,9 +7,30 @@ import java.sql.SQLException;
 import java.util.Date;
 
 public class Repository {
-    static boolean isHoliday(Connection connection, Date date) throws SQLException {
+
+    private Connection connection;
+
+    public Repository(Connection connection) {
+        this.connection = connection;
+    }
+
+    static String putPrices(Connection connection, int liftPassCost, String liftPassType) throws SQLException {
+        try (PreparedStatement stmt = connection.prepareStatement( //
+                "INSERT INTO base_price (type, cost) VALUES (?, ?) " + //
+                        "ON DUPLICATE KEY UPDATE cost = ?")) {
+            stmt.setString(1, liftPassType);
+            stmt.setInt(2, liftPassCost);
+            stmt.setInt(3, liftPassCost);
+            stmt.execute();
+        }
+
+        return "";
+    }
+
+    boolean isHoliday(Connection connection, Date date) throws SQLException {
         boolean isHoliday = false;
-        try (PreparedStatement holidayStmt = connection.prepareStatement( //
+        this.connection = connection;
+        try (PreparedStatement holidayStmt = this.connection.prepareStatement( //
                 "SELECT * FROM holidays")) {
             try (ResultSet holidays = holidayStmt.executeQuery()) {
 
@@ -27,18 +48,5 @@ public class Repository {
             }
         }
         return isHoliday;
-    }
-
-    static String putPrices(Connection connection, int liftPassCost, String liftPassType) throws SQLException {
-        try (PreparedStatement stmt = connection.prepareStatement( //
-                "INSERT INTO base_price (type, cost) VALUES (?, ?) " + //
-                        "ON DUPLICATE KEY UPDATE cost = ?")) {
-            stmt.setString(1, liftPassType);
-            stmt.setInt(2, liftPassCost);
-            stmt.setInt(3, liftPassCost);
-            stmt.execute();
-        }
-
-        return "";
     }
 }
