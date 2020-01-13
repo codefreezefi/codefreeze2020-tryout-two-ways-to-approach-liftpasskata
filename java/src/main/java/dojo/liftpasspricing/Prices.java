@@ -61,13 +61,13 @@ public class Prices {
         } else {
             reduction = 0;
 
-            if (!type.equals("night")) {
+            if (isDay(type)) {
 
                 if (date != null) {
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(date);
-                    if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == 2) {
-                        reduction = 35;
+                    if (!isHoliday) {
+                        if (isMonday(date)) {
+                            reduction = 35;
+                        }
                     }
                 }
 
@@ -100,6 +100,16 @@ public class Prices {
                 }
             }
         }
+    }
+
+    private static boolean isMonday(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        return calendar.get(Calendar.DAY_OF_WEEK) == 2;
+    }
+
+    private static boolean isDay(String type) {
+        return !type.equals("night");
     }
 
     private static boolean isHoliday(Connection connection, Date date) throws SQLException {
