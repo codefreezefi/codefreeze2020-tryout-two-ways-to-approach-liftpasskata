@@ -65,7 +65,7 @@ public class Prices {
             if (!type.equals("night")) {
                 DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                isHoliday = isHoliday(connection, date, isHoliday, isoFormat);
+                isHoliday = isHoliday(connection, date, isoFormat);
 
                 if (date != null) {
                     Calendar calendar = Calendar.getInstance();
@@ -106,7 +106,7 @@ public class Prices {
         }
     }
 
-    private static boolean isHoliday(Connection connection, String date, boolean isHoliday, DateFormat isoFormat) throws SQLException, ParseException {
+    private static boolean isHoliday(Connection connection, String date, DateFormat isoFormat) throws SQLException, ParseException {
         try (PreparedStatement holidayStmt = connection.prepareStatement( //
                 "SELECT * FROM holidays")) {
             try (ResultSet holidays = holidayStmt.executeQuery()) {
@@ -118,14 +118,14 @@ public class Prices {
                         if (d.getYear() == holiday.getYear() && //
                             d.getMonth() == holiday.getMonth() && //
                             d.getDate() == holiday.getDate()) {
-                            isHoliday = true;
+                            return true;
                         }
                     }
                 }
 
             }
         }
-        return isHoliday;
+        return false;
     }
 
     private static String putPrices(Connection connection, int liftPassCost, String liftPassType) throws SQLException {
