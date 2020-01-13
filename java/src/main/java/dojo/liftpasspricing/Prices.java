@@ -122,7 +122,7 @@ public class Prices {
         }
     }
 
-    private static Object putPrices(Connection connection, int liftPassCost, String liftPassType) throws SQLException {
+    private static String putPrices(Connection connection, int liftPassCost, String liftPassType) throws SQLException {
         try (PreparedStatement stmt = connection.prepareStatement( //
                 "INSERT INTO base_price (type, cost) VALUES (?, ?) " + //
                 "ON DUPLICATE KEY UPDATE cost = ?")) {
