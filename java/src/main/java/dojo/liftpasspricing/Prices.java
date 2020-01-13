@@ -65,7 +65,24 @@ public class Prices {
             if (!type.equals("night")) {
                 DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                isHoliday = isHoliday(connection, date, isHoliday, isoFormat);
+                try (PreparedStatement holidayStmt = connection.prepareStatement( //
+                        "SELECT * FROM holidays")) {
+                    try (ResultSet holidays = holidayStmt.executeQuery()) {
+
+                        while (holidays.next()) {
+                            Date holiday = holidays.getDate("holiday");
+                            if (date != null) {
+                                Date d = isoFormat.parse(date);
+                                if (d.getYear() == holiday.getYear() && //
+                                    d.getMonth() == holiday.getMonth() && //
+                                    d.getDate() == holiday.getDate()) {
+                                    isHoliday = true;
+                                }
+                            }
+                        }
+
+                    }
+                }
 
                 if (date != null) {
                     Calendar calendar = Calendar.getInstance();
@@ -104,28 +121,6 @@ public class Prices {
                 }
             }
         }
-    }
-
-    private static boolean isHoliday(Connection connection, String date, boolean isHoliday, DateFormat isoFormat) throws SQLException, ParseException {
-        try (PreparedStatement holidayStmt = connection.prepareStatement( //
-                "SELECT * FROM holidays")) {
-            try (ResultSet holidays = holidayStmt.executeQuery()) {
-
-                while (holidays.next()) {
-                    Date holiday = holidays.getDate("holiday");
-                    if (date != null) {
-                        Date d = isoFormat.parse(date);
-                        if (d.getYear() == holiday.getYear() && //
-                            d.getMonth() == holiday.getMonth() && //
-                            d.getDate() == holiday.getDate()) {
-                            isHoliday = true;
-                        }
-                    }
-                }
-
-            }
-        }
-        return isHoliday;
     }
 
     private static String putPrices(Connection connection, int liftPassCost, String liftPassType) throws SQLException {
