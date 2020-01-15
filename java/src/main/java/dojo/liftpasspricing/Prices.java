@@ -17,6 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.function.Function;
 
 public class Prices {
 
@@ -139,15 +140,27 @@ public class Prices {
         }
     }
 
-    private static ResultSet getPrice(Connection connection, String type) throws SQLException {
-        PreparedStatement costStmt = connection.prepareStatement( //
-                "SELECT cost FROM base_price " + //
-                        "WHERE type = ?");
+    private static ResultSet getPrice(Connection connection, String type) {
+        return getPriceFunction().apply(connection).apply(type);
+    }
 
-        costStmt.setString(1, type);
-        ResultSet result = costStmt.executeQuery();
-        result.next();
-        return result;
+    private static Function<Connection, Function<String,ResultSet>> getPriceFunction() {
+        return (connection) -> (type) -> {
+            try {
+                PreparedStatement costStmt = connection.prepareStatement( //
+                        "SELECT cost FROM base_price " + //
+                                "WHERE type = ?");
+
+                costStmt.setString(1, type);
+                ResultSet result = costStmt.executeQuery();
+                result.next();
+                return result;
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            //TODO: Fix this
+            return null;
+        };
     }
 
 }
