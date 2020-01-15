@@ -15,12 +15,11 @@ public class Repository {
 
     public Repository(Connection connection) {
         this.getPrice = getPriceFunction().apply(connection);
-        this.getHolidays = getHolidaysFunction();
+        this.getHolidays = () -> getHolidaysFunction();
         this.connection = connection;
     }
 
-    private Supplier<ResultSet> getHolidaysFunction() {
-        return () -> {
+    private ResultSet getHolidaysFunction() {
             try {
                 PreparedStatement holidayStmt = connection.prepareStatement( //
                         "SELECT * FROM holidays");
@@ -36,7 +35,6 @@ public class Repository {
             }
             // FIXME return null
             return null;
-        };
     }
 
     private static Function<Connection, Function<String, ResultSet>> getPriceFunction() {
