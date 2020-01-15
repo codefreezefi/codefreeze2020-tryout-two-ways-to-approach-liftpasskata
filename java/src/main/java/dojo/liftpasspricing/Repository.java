@@ -55,8 +55,13 @@ public class Repository {
             ResultSet resultSet = getPrice.apply(type);
             return new BasePrice() {
                 @Override
-                public int get() throws SQLException {
-                    return resultSet.getInt("cost");
+                public int get() {
+                    try {
+                        return resultSet.getInt("cost");
+                    } catch (SQLException e) {
+                        // TODO: double check if this is supposed to happen if there is no cost in the db
+                        return 0;
+                    }
                 }
             };
         };
