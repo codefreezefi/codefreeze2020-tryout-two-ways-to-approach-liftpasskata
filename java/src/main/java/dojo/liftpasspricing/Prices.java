@@ -41,8 +41,8 @@ public class Prices {
             String age1 = req.queryParams("age");
             String type = req.queryParams("type");
             String date = req.queryParams("date");
-            Function<String, ResultSet> getPrice = getPriceFunction().apply(connection);
-            Supplier<ResultSet> getHolidays = getHolidaysFunction().apply(connection);
+            Function<String, ResultSet> getPrice = Repository.getPriceFunction().apply(connection);
+            Supplier<ResultSet> getHolidays = Repository.getHolidaysFunction().apply(connection);
 
             try {
                 return Model.getPrice(new Query(age1, type, date), new Repository(getPrice, getHolidays));
@@ -59,40 +59,6 @@ public class Prices {
         });
 
         return connection;
-    }
-
-    private static Function<Connection, Supplier<ResultSet>> getHolidaysFunction() {
-        return (connection) -> () -> {
-            try {
-                PreparedStatement holidayStmt = connection.prepareStatement( //
-                        "SELECT * FROM holidays");
-
-                return holidayStmt.executeQuery();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            // FIXME return null
-            return null;
-        };
-    }
-
-    private static Function<Connection, Function<String, ResultSet>> getPriceFunction() {
-        return (connection) -> (type) -> {
-            try {
-                PreparedStatement costStmt = connection.prepareStatement( //
-                        "SELECT cost FROM base_price " + //
-                                "WHERE type = ?");
-
-                costStmt.setString(1, type);
-                ResultSet result = costStmt.executeQuery();
-                result.next();
-                return result;
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-            //TODO: Fix this
-            return null;
-        };
     }
 
 }
