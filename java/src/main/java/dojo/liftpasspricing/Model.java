@@ -1,6 +1,5 @@
 package dojo.liftpasspricing;
 
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,7 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class Model {
-    static String getPrice(Query query, Repository repository) throws SQLException, ParseException {
+    static String getPrice(Query query, Repository repository) throws ParseException {
         final Integer age = query.getAge1() != null ? Integer.valueOf(query.getAge1()) : null;
 
         BasePrice basePrice = repository.getGetPrice().apply(query.getType());
