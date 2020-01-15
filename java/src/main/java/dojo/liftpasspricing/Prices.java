@@ -1,19 +1,12 @@
 package dojo.liftpasspricing;
 
-import static spark.Spark.after;
-import static spark.Spark.get;
-import static spark.Spark.port;
-import static spark.Spark.put;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.Date;
+
+import static spark.Spark.*;
 
 public class Prices {
 
