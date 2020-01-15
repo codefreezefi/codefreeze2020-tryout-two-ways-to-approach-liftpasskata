@@ -60,13 +60,7 @@ public class Prices {
 
         final Integer age = age1 != null ? Integer.valueOf(age1) : null;
 
-        PreparedStatement costStmt = connection.prepareStatement( //
-                "SELECT cost FROM base_price " + //
-                        "WHERE type = ?");
-
-        costStmt.setString(1, type);
-        ResultSet result = costStmt.executeQuery();
-        result.next();
+        ResultSet result = getPrice(connection, type);
 
         try {
 
@@ -138,10 +132,22 @@ public class Prices {
                 }
             }
         } finally {
-            result.close();
+            // TODO: make sure the db and resultset is closed properly
+           // result.close();
 
-            costStmt.close();
+          //  costStmt.close();
         }
+    }
+
+    private static ResultSet getPrice(Connection connection, String type) throws SQLException {
+        PreparedStatement costStmt = connection.prepareStatement( //
+                "SELECT cost FROM base_price " + //
+                        "WHERE type = ?");
+
+        costStmt.setString(1, type);
+        ResultSet result = costStmt.executeQuery();
+        result.next();
+        return result;
     }
 
 }
