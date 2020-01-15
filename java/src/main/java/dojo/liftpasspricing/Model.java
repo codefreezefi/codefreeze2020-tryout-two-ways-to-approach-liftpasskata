@@ -12,7 +12,7 @@ public class Model {
     static String getPrice(Query query, Repository repository) throws SQLException, ParseException {
         final Integer age = query.getAge1() != null ? Integer.valueOf(query.getAge1()) : null;
 
-        ResultSet result = repository.getGetPrice().apply(query.getType());
+        BasePrice result = repository.getGetPrice().apply(query.getType());
 
 
         int reduction;

@@ -50,8 +50,16 @@ public class Repository {
         };
     }
 
-    public Function<String, ResultSet> getGetPrice() {
-        return getPrice;
+    public Function<String, BasePrice> getGetPrice() {
+        return (type) -> {
+            ResultSet resultSet = getPrice.apply(type);
+            return new BasePrice() {
+                @Override
+                public int getInt(String cost) throws SQLException {
+                    return resultSet.getInt("cost");
+                }
+            };
+        };
     }
 
     public Supplier<ResultSet> getGetHolidays() {
