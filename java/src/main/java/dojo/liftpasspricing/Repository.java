@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -67,7 +68,29 @@ public class Repository {
         };
     }
 
-    public Supplier<ResultSet> getGetHolidays() {
-        return getHolidays;
+    public Supplier<Holidays> getGetHolidays() {
+        return () -> {
+            ResultSet resultSet = getHolidays.get();
+            return new Holidays() {
+                @Override
+                public Date getDate() {
+                    try {
+                        return resultSet.getDate("holiday");
+                    } catch (SQLException e) {
+                        // FIXME: returns null
+                        return null;
+                    }
+                }
+
+                @Override
+                public boolean next() {
+                    try {
+                        return resultSet.next();
+                    } catch (SQLException e) {
+                        return false;
+                    }
+                }
+            };
+        };
     }
 }

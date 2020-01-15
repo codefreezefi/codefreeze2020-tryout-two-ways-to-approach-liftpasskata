@@ -1,6 +1,5 @@
 package dojo.liftpasspricing;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -25,11 +24,11 @@ public class Model {
             if (!query.getType().equals("night")) {
                 DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                ResultSet holidays = repository.getGetHolidays().get();
+                Holidays holidays = repository.getGetHolidays().get();
                 try {
 
                     while (holidays.next()) {
-                        Date holiday = holidays.getDate("holiday");
+                        Date holiday = holidays.getDate();
                         if (query.getDate() != null) {
                             Date d = isoFormat.parse(query.getDate());
                             if (d.getYear() == holiday.getYear() && //
