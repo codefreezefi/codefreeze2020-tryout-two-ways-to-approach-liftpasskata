@@ -11,14 +11,16 @@ import java.util.function.Supplier;
 public class Repository {
     private final Function<String, ResultSet> getPrice;
     private final Supplier<ResultSet> getHolidays;
+    private final Connection connection;
 
     public Repository(Connection connection) {
         this.getPrice = getPriceFunction().apply(connection);
-        this.getHolidays = getHolidaysFunction().apply(connection);
+        this.getHolidays = getHolidaysFunction();
+        this.connection = connection;
     }
 
-    static Function<Connection, Supplier<ResultSet>> getHolidaysFunction() {
-        return (connection) -> () -> {
+    private Supplier<ResultSet> getHolidaysFunction() {
+        return () -> {
             try {
                 PreparedStatement holidayStmt = connection.prepareStatement( //
                         "SELECT * FROM holidays");
@@ -26,13 +28,18 @@ public class Repository {
                 return holidayStmt.executeQuery();
             } catch (SQLException e) {
                 e.printStackTrace();
+            } finally {
+                // TODO: make sure the db and resultset is closed properly
+                // result.close();
+
+                //  costStmt.close();
             }
             // FIXME return null
             return null;
         };
     }
 
-    static Function<Connection, Function<String, ResultSet>> getPriceFunction() {
+    private static Function<Connection, Function<String, ResultSet>> getPriceFunction() {
         return (connection) -> (type) -> {
             try {
                 PreparedStatement costStmt = connection.prepareStatement( //

@@ -42,14 +42,7 @@ public class Prices {
             String type = req.queryParams("type");
             String date = req.queryParams("date");
 
-            try {
-                return Model.getPrice(new Query(age1, type, date), new Repository(connection));
-            } finally {
-                // TODO: make sure the db and resultset is closed properly
-                // result.close();
-
-                //  costStmt.close();
-            }
+            return Model.getPrice(new Query(age1, type, date), new Repository(connection));
         });
 
         after((req, res) -> {
