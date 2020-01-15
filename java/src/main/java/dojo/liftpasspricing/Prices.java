@@ -45,7 +45,7 @@ public class Prices {
             Supplier<ResultSet> getHolidays = getHolidaysFunction().apply(connection);
 
             try {
-                return Model.getPrice(age1, type, date, getPrice, getHolidays);
+                return Model.getPrice(new Query(age1, type, date), new Repository(getPrice, getHolidays));
             } finally {
                 // TODO: make sure the db and resultset is closed properly
                 // result.close();

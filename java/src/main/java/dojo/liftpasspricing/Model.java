@@ -7,14 +7,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class Model {
-    static String getPrice(String age1, String type, String date, Function<String, ResultSet> getPrice, Supplier<ResultSet> getHolidays) throws SQLException, ParseException {
-        final Integer age = age1 != null ? Integer.valueOf(age1) : null;
+    static String getPrice(Query query, Repository repository) throws SQLException, ParseException {
+        final Integer age = query.getAge1() != null ? Integer.valueOf(query.getAge1()) : null;
 
-        ResultSet result = getPrice.apply(type);
+        ResultSet result = repository.getGetPrice().apply(query.getType());
 
 
         int reduction;
@@ -25,16 +23,16 @@ public class Model {
         } else {
             reduction = 0;
 
-            if (!type.equals("night")) {
+            if (!query.getType().equals("night")) {
                 DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                ResultSet holidays = getHolidays.get();
+                ResultSet holidays = repository.getGetHolidays().get();
                 try {
 
                     while (holidays.next()) {
                         Date holiday = holidays.getDate("holiday");
-                        if (date != null) {
-                            Date d = isoFormat.parse(date);
+                        if (query.getDate() != null) {
+                            Date d = isoFormat.parse(query.getDate());
                             if (d.getYear() == holiday.getYear() && //
                                     d.getMonth() == holiday.getMonth() && //
                                     d.getDate() == holiday.getDate()) {
@@ -50,9 +48,9 @@ public class Model {
                     // holidayStmt.close();
                 }
 
-                if (date != null) {
+                if (query.getDate() != null) {
                     Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(isoFormat.parse(date));
+                    calendar.setTime(isoFormat.parse(query.getDate()));
                     if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == 2) {
                         reduction = 35;
                     }
