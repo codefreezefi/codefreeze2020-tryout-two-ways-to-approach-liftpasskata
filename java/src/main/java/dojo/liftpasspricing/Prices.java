@@ -60,81 +60,87 @@ public class Prices {
 
         final Integer age = age1 != null ? Integer.valueOf(age1) : null;
 
-        try (PreparedStatement costStmt = connection.prepareStatement( //
+        PreparedStatement costStmt = connection.prepareStatement( //
                 "SELECT cost FROM base_price " + //
-                        "WHERE type = ?")) {
-            costStmt.setString(1, type);
-            try (ResultSet result = costStmt.executeQuery()) {
-                result.next();
+                        "WHERE type = ?");
 
-                int reduction;
-                boolean isHoliday = false;
+        costStmt.setString(1, type);
+        ResultSet result = costStmt.executeQuery();
+        result.next();
 
-                if (age != null && age < 6) {
-                    return "{ \"cost\": 0}";
-                } else {
-                    reduction = 0;
+        try {
 
-                    if (!type.equals("night")) {
-                        DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
+            int reduction;
+            boolean isHoliday = false;
 
-                        try (PreparedStatement holidayStmt = connection.prepareStatement( //
-                                "SELECT * FROM holidays")) {
-                            try (ResultSet holidays = holidayStmt.executeQuery()) {
+            if (age != null && age < 6) {
+                return "{ \"cost\": 0}";
+            } else {
+                reduction = 0;
 
-                                while (holidays.next()) {
-                                    Date holiday = holidays.getDate("holiday");
-                                    if (date != null) {
-                                        Date d = isoFormat.parse(date);
-                                        if (d.getYear() == holiday.getYear() && //
-                                                d.getMonth() == holiday.getMonth() && //
-                                                d.getDate() == holiday.getDate()) {
-                                            isHoliday = true;
-                                        }
+                if (!type.equals("night")) {
+                    DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+                    try (PreparedStatement holidayStmt = connection.prepareStatement( //
+                            "SELECT * FROM holidays")) {
+                        try (ResultSet holidays = holidayStmt.executeQuery()) {
+
+                            while (holidays.next()) {
+                                Date holiday = holidays.getDate("holiday");
+                                if (date != null) {
+                                    Date d = isoFormat.parse(date);
+                                    if (d.getYear() == holiday.getYear() && //
+                                            d.getMonth() == holiday.getMonth() && //
+                                            d.getDate() == holiday.getDate()) {
+                                        isHoliday = true;
                                     }
                                 }
-
                             }
-                        }
 
-                        if (date != null) {
-                            Calendar calendar = Calendar.getInstance();
-                            calendar.setTime(isoFormat.parse(date));
-                            if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == 2) {
-                                reduction = 35;
-                            }
                         }
+                    }
 
-                        // TODO apply reduction for others
-                        if (age != null && age < 15) {
-                            return "{ \"cost\": " + (int) Math.ceil(result.getInt("cost") * .7) + "}";
+                    if (date != null) {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(isoFormat.parse(date));
+                        if (!isHoliday && calendar.get(Calendar.DAY_OF_WEEK) == 2) {
+                            reduction = 35;
+                        }
+                    }
+
+                    // TODO apply reduction for others
+                    if (age != null && age < 15) {
+                        return "{ \"cost\": " + (int) Math.ceil(result.getInt("cost") * .7) + "}";
+                    } else {
+                        if (age == null) {
+                            double cost = result.getInt("cost") * (1 - reduction / 100.0);
+                            return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
                         } else {
-                            if (age == null) {
-                                double cost = result.getInt("cost") * (1 - reduction / 100.0);
+                            if (age > 64) {
+                                double cost = result.getInt("cost") * .75 * (1 - reduction / 100.0);
                                 return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
                             } else {
-                                if (age > 64) {
-                                    double cost = result.getInt("cost") * .75 * (1 - reduction / 100.0);
-                                    return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
-                                } else {
-                                    double cost = result.getInt("cost") * (1 - reduction / 100.0);
-                                    return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
-                                }
+                                double cost = result.getInt("cost") * (1 - reduction / 100.0);
+                                return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
                             }
+                        }
+                    }
+                } else {
+                    if (age != null && age >= 6) {
+                        if (age > 64) {
+                            return "{ \"cost\": " + (int) Math.ceil(result.getInt("cost") * .4) + "}";
+                        } else {
+                            return "{ \"cost\": " + result.getInt("cost") + "}";
                         }
                     } else {
-                        if (age != null && age >= 6) {
-                            if (age > 64) {
-                                return "{ \"cost\": " + (int) Math.ceil(result.getInt("cost") * .4) + "}";
-                            } else {
-                                return "{ \"cost\": " + result.getInt("cost") + "}";
-                            }
-                        } else {
-                            return "{ \"cost\": 0}";
-                        }
+                        return "{ \"cost\": 0}";
                     }
                 }
             }
+        } finally {
+            result.close();
+
+            costStmt.close();
         }
     }
 
