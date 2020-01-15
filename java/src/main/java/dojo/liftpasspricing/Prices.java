@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class Prices {
 
@@ -125,10 +126,7 @@ public class Prices {
     }
 
     private static boolean isHoliday(Connection connection, String date, boolean isHoliday, DateFormat isoFormat) throws SQLException, ParseException {
-        PreparedStatement holidayStmt = connection.prepareStatement( //
-                "SELECT * FROM holidays");
-
-        ResultSet holidays = holidayStmt.executeQuery();
+        ResultSet holidays = getHolidays(connection);
         try {
 
             while (holidays.next()) {
@@ -144,11 +142,31 @@ public class Prices {
             }
 
         } finally {
-            holidays.close();
+            // TODO: fix db sessions
+           // holidays.close();
 
-            holidayStmt.close();
+           // holidayStmt.close();
         }
         return isHoliday;
+    }
+
+    private static ResultSet getHolidays(Connection connection) throws SQLException {
+        return getHolidaysFunction().apply(connection).get();
+    }
+
+    private static Function<Connection, Supplier<ResultSet>> getHolidaysFunction() {
+        return (connection) -> () -> {
+            try {
+                PreparedStatement holidayStmt = connection.prepareStatement( //
+                        "SELECT * FROM holidays");
+
+                return holidayStmt.executeQuery();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            // FIXME return null
+            return null;
+        };
     }
 
     private static Function<Connection, Function<String, ResultSet>> getPriceFunction() {
