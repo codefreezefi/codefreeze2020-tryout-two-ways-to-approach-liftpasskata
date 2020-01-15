@@ -41,11 +41,9 @@ public class Prices {
             String age1 = req.queryParams("age");
             String type = req.queryParams("type");
             String date = req.queryParams("date");
-            Function<String, ResultSet> getPrice = Repository.getPriceFunction().apply(connection);
-            Supplier<ResultSet> getHolidays = Repository.getHolidaysFunction().apply(connection);
 
             try {
-                return Model.getPrice(new Query(age1, type, date), new Repository(getPrice, getHolidays));
+                return Model.getPrice(new Query(age1, type, date), new Repository(connection));
             } finally {
                 // TODO: make sure the db and resultset is closed properly
                 // result.close();

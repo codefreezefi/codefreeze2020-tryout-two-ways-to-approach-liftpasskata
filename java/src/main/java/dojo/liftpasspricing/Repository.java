@@ -12,9 +12,9 @@ public class Repository {
     private final Function<String, ResultSet> getPrice;
     private final Supplier<ResultSet> getHolidays;
 
-    public Repository(Function<String, ResultSet> getPrice, Supplier<ResultSet> getHolidays) {
-        this.getPrice = getPrice;
-        this.getHolidays = getHolidays;
+    public Repository(Connection connection) {
+        this.getPrice = getPriceFunction().apply(connection);
+        this.getHolidays = getHolidaysFunction().apply(connection);
     }
 
     static Function<Connection, Supplier<ResultSet>> getHolidaysFunction() {
