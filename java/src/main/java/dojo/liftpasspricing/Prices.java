@@ -77,24 +77,7 @@ public class Prices {
                 if (!type.equals("night")) {
                     DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                    try (PreparedStatement holidayStmt = connection.prepareStatement( //
-                            "SELECT * FROM holidays")) {
-                        try (ResultSet holidays = holidayStmt.executeQuery()) {
-
-                            while (holidays.next()) {
-                                Date holiday = holidays.getDate("holiday");
-                                if (date != null) {
-                                    Date d = isoFormat.parse(date);
-                                    if (d.getYear() == holiday.getYear() && //
-                                            d.getMonth() == holiday.getMonth() && //
-                                            d.getDate() == holiday.getDate()) {
-                                        isHoliday = true;
-                                    }
-                                }
-                            }
-
-                        }
-                    }
+                    isHoliday = isHoliday(connection, date, isHoliday, isoFormat);
 
                     if (date != null) {
                         Calendar calendar = Calendar.getInstance();
@@ -135,13 +118,40 @@ public class Prices {
             }
         } finally {
             // TODO: make sure the db and resultset is closed properly
-           // result.close();
+            // result.close();
 
-          //  costStmt.close();
+            //  costStmt.close();
         }
     }
 
-    private static Function<Connection, Function<String,ResultSet>> getPriceFunction() {
+    private static boolean isHoliday(Connection connection, String date, boolean isHoliday, DateFormat isoFormat) throws SQLException, ParseException {
+        PreparedStatement holidayStmt = connection.prepareStatement( //
+                "SELECT * FROM holidays");
+
+        ResultSet holidays = holidayStmt.executeQuery();
+        try {
+
+            while (holidays.next()) {
+                Date holiday = holidays.getDate("holiday");
+                if (date != null) {
+                    Date d = isoFormat.parse(date);
+                    if (d.getYear() == holiday.getYear() && //
+                            d.getMonth() == holiday.getMonth() && //
+                            d.getDate() == holiday.getDate()) {
+                        isHoliday = true;
+                    }
+                }
+            }
+
+        } finally {
+            holidays.close();
+
+            holidayStmt.close();
+        }
+        return isHoliday;
+    }
+
+    private static Function<Connection, Function<String, ResultSet>> getPriceFunction() {
         return (connection) -> (type) -> {
             try {
                 PreparedStatement costStmt = connection.prepareStatement( //
