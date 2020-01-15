@@ -78,7 +78,27 @@ public class Prices {
                 if (!type.equals("night")) {
                     DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                    isHoliday = isHoliday(connection, date, isHoliday, isoFormat);
+                    ResultSet holidays = getHolidaysFunction().apply(connection).get();
+                    try {
+
+                        while (holidays.next()) {
+                            Date holiday = holidays.getDate("holiday");
+                            if (date != null) {
+                                Date d = isoFormat.parse(date);
+                                if (d.getYear() == holiday.getYear() && //
+                                        d.getMonth() == holiday.getMonth() && //
+                                        d.getDate() == holiday.getDate()) {
+                                    isHoliday = true;
+                                }
+                            }
+                        }
+
+                    } finally {
+                        // TODO: fix db sessions
+                       // holidays.close();
+
+                       // holidayStmt.close();
+                    }
 
                     if (date != null) {
                         Calendar calendar = Calendar.getInstance();
@@ -123,35 +143,6 @@ public class Prices {
 
             //  costStmt.close();
         }
-    }
-
-    private static boolean isHoliday(Connection connection, String date, boolean isHoliday, DateFormat isoFormat) throws SQLException, ParseException {
-        ResultSet holidays = getHolidays(connection);
-        try {
-
-            while (holidays.next()) {
-                Date holiday = holidays.getDate("holiday");
-                if (date != null) {
-                    Date d = isoFormat.parse(date);
-                    if (d.getYear() == holiday.getYear() && //
-                            d.getMonth() == holiday.getMonth() && //
-                            d.getDate() == holiday.getDate()) {
-                        isHoliday = true;
-                    }
-                }
-            }
-
-        } finally {
-            // TODO: fix db sessions
-           // holidays.close();
-
-           // holidayStmt.close();
-        }
-        return isHoliday;
-    }
-
-    private static ResultSet getHolidays(Connection connection) throws SQLException {
-        return getHolidaysFunction().apply(connection).get();
     }
 
     private static Function<Connection, Supplier<ResultSet>> getHolidaysFunction() {
