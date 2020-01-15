@@ -10,12 +10,10 @@ import java.util.function.Supplier;
 
 public class Repository {
     private final Function<String, ResultSet> getPrice;
-    private final Supplier<ResultSet> getHolidays;
     private final Connection connection;
 
     public Repository(Connection connection) {
         this.getPrice = getPriceFunction().apply(connection);
-        this.getHolidays = () -> getHolidaysFunction();
         this.connection = connection;
     }
 
@@ -75,7 +73,7 @@ public class Repository {
 
     public Supplier<Holidays> getGetHolidays() {
         return () -> {
-            ResultSet resultSet = getHolidays.get();
+            ResultSet resultSet =  getHolidaysFunction();
             return new Holidays() {
                 @Override
                 public Date getDate() {
