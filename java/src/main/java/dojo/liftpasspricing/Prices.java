@@ -58,10 +58,11 @@ public class Prices {
         String age1 = req.queryParams("age");
         String type = req.queryParams("type");
         String date = req.queryParams("date");
+        Function<String, ResultSet> getPrice = getPriceFunction().apply(connection);
 
         final Integer age = age1 != null ? Integer.valueOf(age1) : null;
 
-        ResultSet result = getPrice(connection, type);
+        ResultSet result = getPrice.apply(type);
 
         try {
 
@@ -138,10 +139,6 @@ public class Prices {
 
           //  costStmt.close();
         }
-    }
-
-    private static ResultSet getPrice(Connection connection, String type) {
-        return getPriceFunction().apply(connection).apply(type);
     }
 
     private static Function<Connection, Function<String,ResultSet>> getPriceFunction() {
