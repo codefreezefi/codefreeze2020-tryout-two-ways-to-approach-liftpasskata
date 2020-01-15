@@ -12,8 +12,7 @@ public class Model {
     static String getPrice(Query query, Repository repository) throws SQLException, ParseException {
         final Integer age = query.getAge1() != null ? Integer.valueOf(query.getAge1()) : null;
 
-        BasePrice result = repository.getGetPrice().apply(query.getType());
-
+        BasePrice basePrice = repository.getGetPrice().apply(query.getType());
 
         int reduction;
         boolean isHoliday = false;
@@ -58,17 +57,17 @@ public class Model {
 
                 // TODO apply reduction for others
                 if (age != null && age < 15) {
-                    return "{ \"cost\": " + (int) Math.ceil(result.getInt("cost") * .7) + "}";
+                    return "{ \"cost\": " + (int) Math.ceil(basePrice.get() * .7) + "}";
                 } else {
                     if (age == null) {
-                        double cost = result.getInt("cost") * (1 - reduction / 100.0);
+                        double cost = basePrice.get() * (1 - reduction / 100.0);
                         return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
                     } else {
                         if (age > 64) {
-                            double cost = result.getInt("cost") * .75 * (1 - reduction / 100.0);
+                            double cost = basePrice.get() * .75 * (1 - reduction / 100.0);
                             return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
                         } else {
-                            double cost = result.getInt("cost") * (1 - reduction / 100.0);
+                            double cost = basePrice.get() * (1 - reduction / 100.0);
                             return "{ \"cost\": " + (int) Math.ceil(cost) + "}";
                         }
                     }
@@ -76,9 +75,9 @@ public class Model {
             } else {
                 if (age != null && age >= 6) {
                     if (age > 64) {
-                        return "{ \"cost\": " + (int) Math.ceil(result.getInt("cost") * .4) + "}";
+                        return "{ \"cost\": " + (int) Math.ceil(basePrice.get() * .4) + "}";
                     } else {
-                        return "{ \"cost\": " + result.getInt("cost") + "}";
+                        return "{ \"cost\": " + basePrice.get() + "}";
                     }
                 } else {
                     return "{ \"cost\": 0}";

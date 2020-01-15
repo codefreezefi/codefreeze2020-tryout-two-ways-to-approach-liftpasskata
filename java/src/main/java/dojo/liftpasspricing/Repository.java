@@ -55,7 +55,7 @@ public class Repository {
             ResultSet resultSet = getPrice.apply(type);
             return new BasePrice() {
                 @Override
-                public int getInt(String cost) throws SQLException {
+                public int get() throws SQLException {
                     return resultSet.getInt("cost");
                 }
             };
