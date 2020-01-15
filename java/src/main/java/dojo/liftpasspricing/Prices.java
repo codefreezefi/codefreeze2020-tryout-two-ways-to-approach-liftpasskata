@@ -60,6 +60,7 @@ public class Prices {
         String type = req.queryParams("type");
         String date = req.queryParams("date");
         Function<String, ResultSet> getPrice = getPriceFunction().apply(connection);
+        Supplier<ResultSet> getHolidays = getHolidaysFunction().apply(connection);
 
         final Integer age = age1 != null ? Integer.valueOf(age1) : null;
 
@@ -78,7 +79,7 @@ public class Prices {
                 if (!type.equals("night")) {
                     DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-                    ResultSet holidays = getHolidaysFunction().apply(connection).get();
+                    ResultSet holidays = getHolidays.get();
                     try {
 
                         while (holidays.next()) {
@@ -95,9 +96,9 @@ public class Prices {
 
                     } finally {
                         // TODO: fix db sessions
-                       // holidays.close();
+                        // holidays.close();
 
-                       // holidayStmt.close();
+                        // holidayStmt.close();
                     }
 
                     if (date != null) {
