@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -15,24 +17,6 @@ public class Repository {
     public Repository(Connection connection) {
         this.getPrice = getPriceFunction().apply(connection);
         this.connection = connection;
-    }
-
-    private ResultSet getHolidaysFunction() {
-            try {
-                PreparedStatement holidayStmt = connection.prepareStatement( //
-                        "SELECT * FROM holidays");
-
-                return holidayStmt.executeQuery();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                // TODO: make sure the db and resultset is closed properly
-                // result.close();
-
-                //  costStmt.close();
-            }
-            // FIXME return null
-            return null;
     }
 
     private static Function<Connection, Function<String, ResultSet>> getPriceFunction() {
@@ -73,27 +57,53 @@ public class Repository {
 
     public Supplier<Holidays> getGetHolidays() {
         return () -> {
-            ResultSet resultSet =  getHolidaysFunction();
+            List<Date> dates = getDates();
             return new Holidays() {
+                int i = 0;
+
                 @Override
                 public Date getDate() {
-                    try {
-                        return resultSet.getDate("holiday");
-                    } catch (SQLException e) {
-                        // FIXME: returns null
-                        return null;
-                    }
+                    return dates.get(i);
                 }
 
                 @Override
                 public boolean next() {
-                    try {
-                        return resultSet.next();
-                    } catch (SQLException e) {
-                        return false;
-                    }
+                    i = i + 1;
+                    return i < dates.size() - 1;
                 }
             };
         };
+    }
+
+    private List<Date> getDates() {
+        PreparedStatement holidayStmt = null;
+        ResultSet resultSet = null;
+        try {
+            List<Date> dates = new ArrayList();
+
+            holidayStmt = connection.prepareStatement( //
+                    "SELECT * FROM holidays");
+
+            resultSet = holidayStmt.executeQuery();
+            while (resultSet.next()) {
+                dates.add(resultSet.getDate("holiday"));
+            }
+            return dates;
+        } catch (SQLException e) {
+            return new ArrayList<>();
+        } finally {
+            close(holidayStmt);
+            close(resultSet);
+        }
+    }
+
+    private void close(AutoCloseable resource) {
+        if (null != resource) {
+            try {
+                resource.close();
+            } catch (Exception e) {
+
+            }
+        }
     }
 }
