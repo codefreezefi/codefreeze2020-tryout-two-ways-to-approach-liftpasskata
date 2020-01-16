@@ -1,5 +1,7 @@
 # Lift pass pricing
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/codefreezefi/codefreeze2020-tryout-two-ways-to-approach-liftpasskata.svg)](https://greenkeeper.io/)
+
 ![Image logo](./mountain-snow.jpg)
 
 This application solves the problem of calculating the pricing for ski lift passes.
