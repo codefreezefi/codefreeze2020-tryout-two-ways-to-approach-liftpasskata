@@ -1,0 +1,9 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "typescript/package.json"
+      ]
+    }
+  }
+}
